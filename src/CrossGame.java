@@ -183,7 +183,7 @@ public class CrossGame {
             count++;
             i--;
         }
-        if(count == dots) {
+        if(count >= dots) {
             return true;
         }
 
@@ -191,7 +191,43 @@ public class CrossGame {
     }
 
     boolean checkDiagonal(char symb) {
-        
+        int count = 0;
+        int i = last_y;
+        int j = 0;
+        while (i < size && (last_x + j) < size && field[i][last_x + j] == symb) {
+            count++;
+            i++;
+            j++;
+        }
+        i = last_y - 1;
+        j = 0;
+        while (i >= 0 && (last_x - j - 1) >= 0 && field[i][last_x - j - 1] == symb) {
+            count++;
+            i--;
+            j++;
+        }
+        if(count >= dots) {
+            return true;
+        }
+        // водораздел :)
+        count = 0;
+        i = last_y;
+        j = 0;
+        while (i < size && (last_x - j) < size && field[i][last_x - j] == symb) {
+            count++;
+            i++;
+            j++;
+        }
+        i = last_y - 1;
+        j = 0;
+        while (i >= 0 && (last_x + 1 + j) >= 0 && field[i][last_x + 1 + j] == symb) {
+            count++;
+            i--;
+            j++;
+        }
+        if(count >= dots) {
+            return true;
+        }
         return false;
     }
 }
