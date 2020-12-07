@@ -1,3 +1,7 @@
+// Использованы материалы с сайтов:
+// https://www.dokwork.ru/2012/11/tictactoe.html
+// https://habr.com/ru/post/329300/
+
 import java.util.Random;
 import java.util.Scanner;
 
@@ -11,11 +15,15 @@ public class CrossGame {
     private final char DOT_EMPTY = '•';
     private final char DOT_X = 'X';
     private final char DOT_O = 'O';
+    private int last_x;
+    private int last_y;
 
     public CrossGame() {
         sc = new Scanner(System.in);
         rnd = new Random();
         exit = false;
+        last_y = 0;
+        last_x = 0;
     }
 
     public void startGame() {
@@ -59,13 +67,21 @@ public class CrossGame {
     }
 
     private void mainLoop() {
-//        do {
-        printGreetings();
-        printField();
-        turnPlayer();
-        isWin(char ch);
-        turnComputer();
-//        }while (!exit);
+        do {
+            printGreetings();
+            printField();
+            turnPlayer();
+            if(isWin(DOT_X)) {
+                exit = true;
+                System.out.println("Вы выиграли!!!!");
+                continue;
+            }
+            turnComputer();
+            if(isWin(DOT_O)) {
+                exit = true;
+                continue;
+            }
+        }while (!exit);
     }
 
     private void printGreetings() {
@@ -100,8 +116,11 @@ public class CrossGame {
             } else {
                 field[y][x] = DOT_X;
                 printField();
-                break;
             }
+
+            last_x = x;
+            last_y = y;
+            break;
         } while (true);
     }
 
@@ -125,10 +144,54 @@ public class CrossGame {
     }
 
     private boolean isWin(char ch) {
-        return false;
+        return checkHorizontal(ch) || checkVertical(ch) || checkDiagonal(ch);
     }
 
     private void turnComputer() {
         // мдя......
+    }
+
+    boolean checkHorizontal(char symb) {
+        int count = 0;
+
+        int i = last_x;
+        while (i < size && field[last_y][i] == symb) {
+            count++;
+            i++;
+        }
+        i = last_x - 1;
+        while (i >= 0 && field[last_y][i] == symb) {
+            count++;
+            i--;
+        }
+        if (count >= dots) {
+            return true;
+        }
+
+        return false;
+    }
+    private boolean checkVertical(char symb) {
+        int count = 0;
+
+        int i = last_y;
+        while (i < size && field[i][last_x] == symb) {
+            count++;
+            i++;
+        }
+        i = last_y - 1;
+        while (i >= 0 && field[i][last_x] == symb) {
+            count++;
+            i--;
+        }
+        if(count == dots) {
+            return true;
+        }
+
+        return false;
+    }
+
+    boolean checkDiagonal(char symb) {
+        
+        return false;
     }
 }
