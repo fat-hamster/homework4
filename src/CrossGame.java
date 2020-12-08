@@ -17,6 +17,7 @@ public class CrossGame {
     private final char DOT_O = 'O';
     private int last_x;
     private int last_y;
+    private int all_turns;
 
     public CrossGame() {
         sc = new Scanner(System.in);
@@ -24,6 +25,7 @@ public class CrossGame {
         exit = false;
         last_y = 0;
         last_x = 0;
+        all_turns = 0;
     }
 
     public void startGame() {
@@ -56,6 +58,7 @@ public class CrossGame {
             dots = 5;
         }
         field = new char[size][size];
+        all_turns = size * size;
     }
 
     private void initField() {
@@ -70,10 +73,20 @@ public class CrossGame {
         do {
             printGreetings();
             printField();
+            if(all_turns <= 0) {
+                System.out.println("Ничья. Ходов не осталось.");
+                exit = true;
+                continue;
+            }
             turnPlayer();
             if(isWin(DOT_X)) {
                 exit = true;
                 System.out.println("Вы выиграли!!!!");
+                continue;
+            }
+            if(all_turns <= 0) {
+                System.out.println("Ничья. Ходов не осталось.");
+                exit = true;
                 continue;
             }
             turnComputer();
@@ -105,6 +118,7 @@ public class CrossGame {
     }
 
     private void turnPlayer() {
+        System.out.println("Ход игрока");
         int x, y;
         do {
             x = tryInput("X") - 1;
@@ -144,11 +158,13 @@ public class CrossGame {
     }
 
     private boolean isWin(char ch) {
+        all_turns--;
         return checkHorizontal(ch) || checkVertical(ch) || checkDiagonal(ch);
     }
 
     private void turnComputer() {
         // мдя......
+        System.out.println("Ход компьютера");
     }
 
     boolean checkHorizontal(char symb) {
@@ -193,18 +209,20 @@ public class CrossGame {
     boolean checkDiagonal(char symb) {
         int count = 0;
         int i = last_y;
-        int j = 0;
-        while (i < size && (last_x + j) < size && field[i][last_x + j] == symb) {
+        int j = last_x;
+        // диагональ \ вниз
+        while (i < size && j < size && field[i][j] == symb) {
             count++;
             i++;
             j++;
         }
         i = last_y - 1;
-        j = 0;
-        while (i >= 0 && (last_x - j - 1) >= 0 && field[i][last_x - j - 1] == symb) {
+        j = last_x - 1;
+        // диагональ \ вверх
+        while (i >= 0 && j >= 0 && field[i][j] == symb) {
             count++;
             i--;
-            j++;
+            j--;
         }
         if(count >= dots) {
             return true;
@@ -212,15 +230,17 @@ public class CrossGame {
         // водораздел :)
         count = 0;
         i = last_y;
-        j = 0;
-        while (i < size && (last_x - j) < size && field[i][last_x - j] == symb) {
+        j = last_x;
+        // диагональ / вниз
+        while(i < size && j >= 0 && field[i][j] == symb) {
             count++;
             i++;
-            j++;
+            j--;
         }
         i = last_y - 1;
-        j = 0;
-        while (i >= 0 && (last_x + 1 + j) >= 0 && field[i][last_x + 1 + j] == symb) {
+        j = last_x + 1;
+        // диагональ / вверх
+        while (i >= 0 && j < size && field[i][j] == symb) {
             count++;
             i--;
             j++;
