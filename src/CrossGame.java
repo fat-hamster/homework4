@@ -76,27 +76,32 @@ public class CrossGame {
         do {
             printGreetings();
             printField();
-            if(all_turns <= 0) {
-                System.out.println("Ничья. Ходов не осталось.");
-                exit = true;
-                continue;
-            }
             turnPlayer();
             if(isWin(DOT_X)) {
                 exit = true;
                 System.out.println("Вы выиграли!!!!");
                 continue;
             }
-            if(all_turns <= 0) {
-                System.out.println("Ничья. Ходов не осталось.");
-                exit = true;
+            if(exit = noWin()) {
                 continue;
             }
             turnComputer();
             if(isWin(DOT_O)) {
+                printField();
                 exit = true;
+                System.out.println("Выиграл компьютер :(");
+                continue;
             }
+            exit = noWin();
         }while (!exit);
+    }
+
+    private boolean noWin() {
+        if(all_turns <= 0) {
+            System.out.println("Ничья. Ходов не осталось.");
+            return true;
+        }
+        return false;
     }
 
     private void printGreetings() {
@@ -179,14 +184,20 @@ public class CrossGame {
 
     private boolean lookWinTurn(char symbol) {
         if(lookHorizontalWin(symbol)) {
+            last_y = win_y;
+            last_x = win_x;
             field[win_y][win_x] = DOT_O;
             return true;
         }
         if(lookVerticalWin(symbol)) {
+            last_y = win_y;
+            last_x = win_x;
             field[win_y][win_x] = DOT_O;
             return true;
         }
         if(lookDiagonalWin(symbol)) {
+            last_y = win_y;
+            last_x = win_x;
             field[win_y][win_x] = DOT_O;
             return true;
         }
@@ -284,7 +295,7 @@ public class CrossGame {
         boolean possible = false;
 
         for (int i = 0; i < size; i++) {
-            if(horizontalFoul(i)) {
+            if(isHorizontalFull(i)) {
                 continue;
             }
             for (int j = pos; j < size; j++) {
@@ -301,10 +312,10 @@ public class CrossGame {
                         win_x = -1;
                         win_y = -1;
                     }
-                }
-                if(count == dots) {
-                    win_y = i;
-                    return true;
+                    if(count == dots) {
+                        win_y = i;
+                        return true;
+                    }
                 }
             }
             pos++;
@@ -313,7 +324,7 @@ public class CrossGame {
         return false;
     }
 
-    private boolean horizontalFoul(int y) {
+    private boolean isHorizontalFull(int y) {
         for (int i = 0; i < size; i++) {
             if(field[y][i] == DOT_EMPTY) {
                 return false;
@@ -328,7 +339,7 @@ public class CrossGame {
         boolean possible = false;
 
         for (int i = 0; i < size; i++) {
-            if(verticalFoul(i)) {
+            if(isVerticalFull(i)) {
                 continue;
             }
             for (int j = pos; j < size; j++) {
@@ -357,7 +368,7 @@ public class CrossGame {
         return false;
     }
 
-    private boolean verticalFoul(int x) {
+    private boolean isVerticalFull(int x) {
         for (int i = 0; i < size; i++) {
             if(field[i][x] == DOT_EMPTY) {
                 return false;
@@ -370,13 +381,70 @@ public class CrossGame {
         int pos = 0;
         int count = 0;
         boolean possible = false;
-
         
+        // Для диагоналей \
+        for (int y = size - dots; y >= 0; y--) {
+            if(isDiagonalFull(y, 0)) {
+                continue;
+            }
+            for (int i = 0; i+y < size; i++) {
+                if(field[y+i][i] == symbol) {
+                    count++;
+                } else {
+                    if(field[y+i][i] == DOT_EMPTY && !possible) {
+                        count++;
+                        possible = true;
+                        win_x = i;
+                    } else {
+                        count = 0;
+                        possible = false;
+                        win_x = - 1;
+                        win_y = -1;
+                    }
+                }
+            }
+            if(count == dots) {
+                win_y = y;
+                return true;
+            }
+        }
+        for (int x = 1; x <= size - dots; x++) {
+            if(isDiagonalFull(0, x)) {
+                continue;
+            }
+            for (int i = x; i < size; i++) {
+                if(field[i - 1][i] == symbol) {
+                    count++;
+                } else {
+                    if(field[i - 1][i] == DOT_EMPTY && !possible) {
+                        count++;
+                        possible = true;
+                        win_x = i;
+                    } else {
+                        count = 0;
+                        possible = false;
+                        win_x = - 1;
+                        win_y = -1;
+                    }
+                }
+            }
+            if(count == dots) {
+                win_y = x - 1;
+                return true;
+            }
+        }
         return false;
     }
 
-    private boolean diagonalFoul(int x, int y) {
-
+    private boolean isDiagonalFull(int y, int x) {
+        /*if(x + dots > size || y + dots > size) {
+            return true;
+        }*/
+        for (int i = 0; i < dots; i++) {
+            if(field[y + i][x + i] == DOT_EMPTY) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -393,5 +461,7 @@ public class CrossGame {
                 exit = true;
             }
         }while (!exit);
+        last_x = x;
+        last_y = y;
     }
 }
