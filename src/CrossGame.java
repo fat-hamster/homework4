@@ -1,6 +1,5 @@
-// Использованы материалы с сайтов:
+// Использованы материалы с сайта:
 // https://www.dokwork.ru/2012/11/tictactoe.html
-// https://habr.com/ru/post/329300/
 
 import java.util.Random;
 import java.util.Scanner;
@@ -18,6 +17,8 @@ public class CrossGame {
     private int last_x;
     private int last_y;
     private int all_turns;
+    private int win_x;
+    private int win_y;
 
     public CrossGame() {
         sc = new Scanner(System.in);
@@ -26,6 +27,8 @@ public class CrossGame {
         last_y = 0;
         last_x = 0;
         all_turns = 0;
+        win_x = -1;
+        win_y = -1;
     }
 
     public void startGame() {
@@ -92,13 +95,11 @@ public class CrossGame {
             turnComputer();
             if(isWin(DOT_O)) {
                 exit = true;
-                continue;
             }
         }while (!exit);
     }
 
     private void printGreetings() {
-        System.out.println("Крестики-Нолики v.0.0.1");
         System.out.println("Для хода введите координаты по горизонтали (Х) и вертикали (Y)");
     }
 
@@ -163,20 +164,45 @@ public class CrossGame {
     }
 
     private void turnComputer() {
-        // мдя......
         System.out.println("Ход компьютера");
+        // есть выигрышный ход?
+        if(lookWinTurn(DOT_O)) {
+            return;
+        }
+        // нужно блокировать выигрыш человека?
+        if(lookWinTurn(DOT_X)) {
+            return;
+        }
+        // ход
+        rndTurn();
     }
 
-    boolean checkHorizontal(char symb) {
+    private boolean lookWinTurn(char symbol) {
+        if(lookHorizontalWin(symbol)) {
+            field[win_y][win_x] = DOT_O;
+            return true;
+        }
+        if(lookVerticalWin(symbol)) {
+            field[win_y][win_x] = DOT_O;
+            return true;
+        }
+        if(lookDiagonalWin(symbol)) {
+            field[win_y][win_x] = DOT_O;
+            return true;
+        }
+        return false;
+    }
+
+    boolean checkHorizontal(char symbol) {
         int count = 0;
 
         int i = last_x;
-        while (i < size && field[last_y][i] == symb) {
+        while (i < size && field[last_y][i] == symbol) {
             count++;
             i++;
         }
         i = last_x - 1;
-        while (i >= 0 && field[last_y][i] == symb) {
+        while (i >= 0 && field[last_y][i] == symbol) {
             count++;
             i--;
         }
@@ -186,16 +212,17 @@ public class CrossGame {
 
         return false;
     }
-    private boolean checkVertical(char symb) {
+
+    private boolean checkVertical(char symbol) {
         int count = 0;
 
         int i = last_y;
-        while (i < size && field[i][last_x] == symb) {
+        while (i < size && field[i][last_x] == symbol) {
             count++;
             i++;
         }
         i = last_y - 1;
-        while (i >= 0 && field[i][last_x] == symb) {
+        while (i >= 0 && field[i][last_x] == symbol) {
             count++;
             i--;
         }
@@ -206,12 +233,12 @@ public class CrossGame {
         return false;
     }
 
-    boolean checkDiagonal(char symb) {
+    boolean checkDiagonal(char symbol) {
         int count = 0;
         int i = last_y;
         int j = last_x;
         // диагональ \ вниз
-        while (i < size && j < size && field[i][j] == symb) {
+        while (i < size && j < size && field[i][j] == symbol) {
             count++;
             i++;
             j++;
@@ -219,7 +246,7 @@ public class CrossGame {
         i = last_y - 1;
         j = last_x - 1;
         // диагональ \ вверх
-        while (i >= 0 && j >= 0 && field[i][j] == symb) {
+        while (i >= 0 && j >= 0 && field[i][j] == symbol) {
             count++;
             i--;
             j--;
@@ -232,7 +259,7 @@ public class CrossGame {
         i = last_y;
         j = last_x;
         // диагональ / вниз
-        while(i < size && j >= 0 && field[i][j] == symb) {
+        while(i < size && j >= 0 && field[i][j] == symbol) {
             count++;
             i++;
             j--;
@@ -240,7 +267,7 @@ public class CrossGame {
         i = last_y - 1;
         j = last_x + 1;
         // диагональ / вверх
-        while (i >= 0 && j < size && field[i][j] == symb) {
+        while (i >= 0 && j < size && field[i][j] == symbol) {
             count++;
             i--;
             j++;
@@ -249,5 +276,122 @@ public class CrossGame {
             return true;
         }
         return false;
+    }
+
+    private boolean lookHorizontalWin(char symbol) {
+        int count = 0;
+        int pos = 0;
+        boolean possible = false;
+
+        for (int i = 0; i < size; i++) {
+            if(horizontalFoul(i)) {
+                continue;
+            }
+            for (int j = pos; j < size; j++) {
+                if(field[i][j] == symbol) {
+                    count++;
+                } else {
+                    if(field[i][j] == DOT_EMPTY && !possible) {
+                        possible = true;
+                        win_x = j;
+                        count++;
+                    } else {
+                        count = 0;
+                        possible = false;
+                        win_x = -1;
+                        win_y = -1;
+                    }
+                }
+                if(count == dots) {
+                    win_y = i;
+                    return true;
+                }
+            }
+            pos++;
+            possible = false;
+        }
+        return false;
+    }
+
+    private boolean horizontalFoul(int y) {
+        for (int i = 0; i < size; i++) {
+            if(field[y][i] == DOT_EMPTY) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean lookVerticalWin(char symbol) {
+        int count = 0;
+        int pos = 0;
+        boolean possible = false;
+
+        for (int i = 0; i < size; i++) {
+            if(verticalFoul(i)) {
+                continue;
+            }
+            for (int j = pos; j < size; j++) {
+                if(field[j][i] == symbol) {
+                    count++;
+                } else {
+                    if(field[j][i] == DOT_EMPTY && !possible) {
+                        possible = true;
+                        win_x = i;
+                        count++;
+                    } else {
+                        count = 0;
+                        possible = false;
+                        win_x = -1;
+                        win_y = -1;
+                    }
+                }
+                if(count == dots) {
+                    win_y = j;
+                    return true;
+                }
+            }
+            pos++;
+            possible = false;
+        }
+        return false;
+    }
+
+    private boolean verticalFoul(int x) {
+        for (int i = 0; i < size; i++) {
+            if(field[i][x] == DOT_EMPTY) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean lookDiagonalWin(char symbol) {
+        int pos = 0;
+        int count = 0;
+        boolean possible = false;
+
+        
+        return false;
+    }
+
+    private boolean diagonalFoul(int x, int y) {
+
+        return true;
+    }
+
+    private void rndTurn() {
+        int x = 0;
+        int y = 0;
+        boolean exit = false;
+
+        do {
+            x = rnd.nextInt(size);
+            y = rnd.nextInt(size);
+            if(field[y][x] == DOT_EMPTY) {
+                field[y][x] = DOT_O;
+                exit = true;
+            }
+        }while (!exit);
     }
 }
