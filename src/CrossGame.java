@@ -169,9 +169,9 @@ public class CrossGame {
     private void turnComputer() {
         System.out.println("Ход компьютера");
         // есть выигрышный ход?
-       /* if(lookWinTurn(DOT_O)) {
+        if(lookWinTurn(DOT_O)) {
             return;
-        } */
+        }
         // нужно блокировать выигрыш человека?
         if(lookWinTurn(DOT_X)) {
             return;
