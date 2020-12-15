@@ -502,30 +502,32 @@ public class CrossGame {
             }
         }
         // для диагонали /
-        for (int x = 1; x <= size - dots; x++) {
-            if(isDiagonalFull(0, x) && isDiagonalEmpty(0, x)) {
+        pos = 0;
+        count = 0;
+        possible = false;
+        for (int y = size - dots; y >= 0; y--) {
+            if(isDiagonalFull(y, 0) || isDiagonalEmpty(y, 0)) {
                 continue;
             }
-
-            for (int i = x; i < size; i++) {
-                if(field[i - 1][i] == symbol) {
+            for (int i = 0; i+y < size; i++) {
+                if(field[y+i][i] == symbol) {
                     count++;
                 } else {
-                    if(field[i - 1][i] == DOT_EMPTY && !possible) {
+                    if(field[y+i][i] == DOT_EMPTY && !possible) {
                         count++;
                         possible = true;
                         win_x = i;
+                        win_y = y+i;
                     } else {
                         count = 0;
                         possible = false;
-                        win_x = - 1;
+                        win_x = -1;
                         win_y = -1;
                     }
                 }
-            }
-            if(count == dots) {
-                win_y = x - 1;
-                return true;
+                if(count == dots) {
+                    return true;
+                }
             }
         }
         return false;
