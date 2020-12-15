@@ -363,6 +363,7 @@ public class CrossGame {
                 if(field[y][x] == DOT_EMPTY) {
                     pos_x = x;
                 }
+            count = 0;
             }
         }
         return false;
@@ -446,6 +447,7 @@ public class CrossGame {
                     pos_y = y;
                 }
             }
+            count = 0;
         }
         return false;
     }
@@ -486,6 +488,7 @@ public class CrossGame {
                         count++;
                         possible = true;
                         win_x = i;
+                        win_y = y+i;
                     } else {
                         count = 0;
                         possible = false;
@@ -493,10 +496,9 @@ public class CrossGame {
                         win_y = -1;
                     }
                 }
-            }
-            if(count == dots) {
-                win_y = y;
-                return true;
+                if(count == dots) {
+                    return true;
+                }
             }
         }
         // для диагонали /
