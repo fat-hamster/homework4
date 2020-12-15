@@ -19,6 +19,8 @@ public class CrossGame {
     private int all_turns;
     private int win_x;
     private int win_y;
+    private final char SLASH = '/';
+    private final char BACK_SLASH = '\\';
 
     public CrossGame() {
         sc = new Scanner(System.in);
@@ -477,7 +479,7 @@ public class CrossGame {
 
         // Для диагоналей \
         for (int y = size - dots; y >= 0; y--) {
-            if(isDiagonalFull(y, 0) || isDiagonalEmpty(y, 0)) {
+            if(isDiagonalFull(y, 0, BACK_SLASH) || isDiagonalEmpty(y, 0, BACK_SLASH)) {
                 continue;
             }
             for (int i = 0; i+y < size; i++) {
@@ -501,15 +503,15 @@ public class CrossGame {
                 }
             }
         }
-        // для диагонали /
-        pos = 0;
+        // для диагонали /   (не получается реализовать)
+        /*pos = 0;
         count = 0;
         possible = false;
-        for (int y = size - dots; y >= 0; y--) {
-            if(isDiagonalFull(y, 0) || isDiagonalEmpty(y, 0)) {
+        for (int y = size-1; y >= size - dots; y--) {
+            if(isDiagonalFull(y, 0, SLASH) || isDiagonalEmpty(y, 0, SLASH)) {
                 continue;
             }
-            for (int i = 0; i+y < size; i++) {
+            for (int i = y; i+y < size; i++) {
                 if(field[y+i][i] == symbol) {
                     count++;
                 } else {
@@ -529,23 +531,39 @@ public class CrossGame {
                     return true;
                 }
             }
-        }
+        } */
         return false;
     }
 
-    private boolean isDiagonalFull(int y, int x) {
-        for (int i = 0; i < dots; i++) {
-            if(field[y + i][x + i] == DOT_EMPTY) {
-                return false;
+    private boolean isDiagonalFull(int y, int x, char slash) {
+        if(slash == BACK_SLASH) {
+            for (int i = 0; i < dots; i++) {
+                if (field[y + i][x + i] == DOT_EMPTY) {
+                    return false;
+                }
+            }
+        } else {
+            for (int i = dots - 1; i >= 0; i--) {
+                if(field[Math.abs(y - i)][Math.abs(x - i)] == DOT_EMPTY) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
-    private boolean isDiagonalEmpty(int y, int x) {
-        for (int i = 0; i < dots; i++) {
-            if(field[y + i][x + i] != DOT_EMPTY) {
-                return false;
+    private boolean isDiagonalEmpty(int y, int x, char slash) {
+        if(slash == BACK_SLASH) {
+            for (int i = 0; i < dots; i++) {
+                if (field[y + i][x + i] != DOT_EMPTY) {
+                    return false;
+                }
+            }
+        } else {
+            for (int i = dots - 1; i >= 0; i--) {
+                if(field[Math.abs(y - i)][Math.abs(x - i)] != DOT_EMPTY) {
+                    return false;
+                }
             }
         }
         return true;
