@@ -311,11 +311,13 @@ public class CrossGame {
                     if(x == 0) {
                         start = true;
                         continue;
+                    } else {
+                        //start = false;
                     }
                     if(x == size - 1) {
                         end = true;
                     }
-                    if(count > 1) {
+                    if(count > 1 && !start) {
                         middle = true;
                     }
                 }
@@ -347,7 +349,7 @@ public class CrossGame {
                     return true;
                 }
                 if(count == (dots - 1)) {
-                    if(field[y][x - count] == DOT_EMPTY) {
+                    if(field[y][x - (count - 1)] == DOT_EMPTY) {
                         win_y = y;
                         win_x = x - count;
                         return true;
